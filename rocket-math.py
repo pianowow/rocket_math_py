@@ -15,6 +15,8 @@ import sys
 import argparse
 import os
 
+test = 4 / 0
+
 parser = argparse.ArgumentParser(prog='rocket-math.py')
 parser.add_argument('-s','--seconds',action='store_true', help='fixed seconds mode')
 parser.add_argument('operation', help='operation (a,s,m,d)', nargs='?', default='m')
@@ -115,29 +117,32 @@ def do_it(stdscr):
             x = new_question(op_code)
             win_print(w_question, "Question {}\n{} {} {} =".format(questions_answered+1,x['num1'],x['operation'],x['num2']), 2)
             s_time = time.time()
-            user_input_int = -1
-            while user_input_int == -1: 
+            answer_is_valid = False
+            while not answer_is_valid:
                 #getstr returns bytes, which decode() turns into a string
-                user_input = w_answer.getstr(0,0).decode() 
+                user_input = w_answer.getstr(0,0).decode().lower()
                 w_answer.clear()
                 w_answer.refresh()
-                if user_input.lower() == "q":
+                if user_input == "q":
                     sys.exit()
-                elif user_input.lower() in ["a","s","m","d"]:
-                    op_code = user_input.lower()
+                elif user_input in ["a","s","m","d"]:
+                    op_code = user_input
                     break
-                elif user_input.lower() == "p":
-                    win_print(w_question, "Timer is paused.  Press any key to continue...", 2) 
+                elif user_input == "p":
+                    win_print(w_question, "Timer is paused.  Press any key to continue...", 2)
                     w_answer.getch(0,0)
                     w_answer.clear()
                     w_answer.refresh()
                     break
                 try:
                     user_input_int = int(user_input)
+                    answer_is_valid = True
                 except ValueError: #shouldn't mark a question wrong because the user mistyped
                     win_print(w_feedback, "Oops, that doesn't look like a number", 1)
-            else: #only runs if the loop actually completes (not broken out of)
-                e_time = time.time() 
+                    continue
+
+            if answer_is_valid: # needed for commands like p/a/s/m/d that break the above loop
+                e_time = time.time()
                 seconds_passed = seconds_passed + e_time - s_time
                 questions_answered = questions_answered + 1
                 seconds = round(e_time-s_time,1)
