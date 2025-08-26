@@ -15,8 +15,6 @@ import sys
 import argparse
 import os
 
-test = 4 / 0
-
 parser = argparse.ArgumentParser(prog='rocket-math.py')
 parser.add_argument('-s','--seconds',action='store_true', help='fixed seconds mode')
 parser.add_argument('operation', help='operation (a,s,m,d)', nargs='?', default='m')
